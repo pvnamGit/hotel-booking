@@ -3,6 +3,7 @@ package com.hrs.core.domain.account;
 import com.hrs.core.domain.shared.BaseEntity;
 import com.hrs.core.domain.user.User;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -13,6 +14,7 @@ import javax.persistence.*;
 @Builder
 @Entity
 @Table(name = "accounts")
+@Where(clause = "is_active = true")
 public class Account extends BaseEntity {
 
   @Column(name = "email", unique = true, nullable = false)

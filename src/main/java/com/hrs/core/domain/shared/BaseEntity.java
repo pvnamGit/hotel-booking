@@ -1,5 +1,6 @@
 package com.hrs.core.domain.shared;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Lazy;

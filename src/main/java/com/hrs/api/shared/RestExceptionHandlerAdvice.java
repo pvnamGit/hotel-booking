@@ -3,22 +3,24 @@ package com.hrs.api.shared;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hrs.api.shared.errors.ErrorCode;
 
-import java.nio.file.AccessDeniedException;
-import java.util.List;
-import java.util.stream.Collectors;
 import javax.naming.AuthenticationException;
 import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolationException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
@@ -104,5 +106,15 @@ public class RestExceptionHandlerAdvice {
     log.error("BadCredentialsException {}", e.getMessage(), e);
     return BaseEntityResponse.error(
         new BaseErrorResponse(ErrorCode.E008.getCode(), ErrorCode.E008.getMessage(), null, null));
+  }
+
+  @SneakyThrows
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public BaseEntityResponse dataIntegrityViolationException(DataIntegrityViolationException e) {
+    log.error("DataIntegrityViolationException {}", e.getMessage(), e);
+    return BaseEntityResponse.error(
+            new BaseErrorResponse(
+                    ErrorCode.E009.getCode(), ErrorCode.E009.getMessage(), e.getLocalizedMessage(), null));
   }
 }

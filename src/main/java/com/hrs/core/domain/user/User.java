@@ -1,9 +1,13 @@
 package com.hrs.core.domain.user;
 
 import com.hrs.core.domain.account.Account;
+import com.hrs.core.domain.reservation.HotelReservation;
 import com.hrs.core.domain.shared.BaseEntity;
 import javax.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -12,6 +16,7 @@ import lombok.*;
 @Builder
 @Entity
 @Table(name = "users")
+@Where(clause = "is_active = true")
 public class User extends BaseEntity {
   @Column(name = "first_name", nullable = false)
   private String firstName;
@@ -37,4 +42,7 @@ public class User extends BaseEntity {
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "account_id")
   private Account account;
+
+  @OneToMany(mappedBy = "user")
+  private List<HotelReservation> hotelReservations;
 }

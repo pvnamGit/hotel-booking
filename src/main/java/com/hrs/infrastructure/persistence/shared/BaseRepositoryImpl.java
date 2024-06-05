@@ -64,6 +64,12 @@ public abstract class BaseRepositoryImpl<T, ID extends Serializable>
   }
 
   @Override
+  @Transactional
+  public void merge(T t) {
+    entityManager.merge(t);
+  }
+
+  @Override
   public List<T> findAll() {
     CriteriaQuery cq = createCriteriaQuery();
     try {
@@ -94,6 +100,7 @@ public abstract class BaseRepositoryImpl<T, ID extends Serializable>
     CriteriaUpdate<T> delete = cb.createCriteriaUpdate(entityClass);
     Root<T> root = delete.from(entityClass);
     delete.where(cb.equal(root.get(ENTITY_ID), id)); // Assuming "id" is the ID field
+    delete.where(cb.equal(root.get(IS_ACTIVE), true)); // Assuming "id" is the ID field
     delete.set(IS_ACTIVE, false);
     delete.set(UPDATED_AT, Instant.now().toEpochMilli());
     entityManager.createQuery(delete).executeUpdate();
@@ -106,6 +113,7 @@ public abstract class BaseRepositoryImpl<T, ID extends Serializable>
     CriteriaDelete<T> delete = cb.createCriteriaDelete(entityClass);
     Root<T> root = delete.from(entityClass);
     delete.where(cb.equal(root.get(ENTITY_ID), id)); // Assuming "id" is the ID field
+    delete.where(cb.equal(root.get(IS_ACTIVE), true)); // Assuming "id" is the ID field
     entityManager.createQuery(delete).executeUpdate();
   }
 }
