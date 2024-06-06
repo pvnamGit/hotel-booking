@@ -1,7 +1,6 @@
 package com.hrs.core.service.hotel.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.constraints.Min;
@@ -11,6 +10,7 @@ import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
+@Builder
 public class HotelSearchCriteria {
     private String location;
 

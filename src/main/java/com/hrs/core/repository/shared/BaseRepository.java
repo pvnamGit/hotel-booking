@@ -19,4 +19,5 @@ public interface BaseRepository<T, ID extends Serializable> {
   void softDelete(Long id);
 
   void hardDelete(Long id);
+  void deleteAll();
 }

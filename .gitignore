@@ -13,3 +13,4 @@ target
 
 ### Enviroment variavble ###
 .env
+.env.docker

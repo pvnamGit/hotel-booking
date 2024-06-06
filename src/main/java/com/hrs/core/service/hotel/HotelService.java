@@ -5,22 +5,21 @@ import com.hrs.core.domain.hotel.HotelRoom;
 import com.hrs.core.service.hotel.request.*;
 import com.hrs.core.service.hotel.response.HotelDetailResponse;
 import com.hrs.core.service.hotel.response.HotelRoomDetailResponse;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 public interface HotelService {
-    HotelDetailResponse createHotel(HotelCreateRequest request);
-    HotelDetailResponse updateHotel(Long id, HotelUpdateRequest request);
-    List<HotelDetailResponse> findHotels(HotelSearchCriteria searchCriteria);
-    HotelDetailResponse getHotelDetail(Long id);
-    void deleteHotel(Long id);
-    Hotel getHotelById(Long id);
+  List<HotelDetailResponse> findHotels(HotelSearchCriteria searchCriteria);
 
-    HotelRoomDetailResponse createRoom(Long hotelId, HotelRoomCreateRequest request);
-    HotelRoomDetailResponse updateRoom(Long hotelId, Long roomId, HotelRoomUpdateRequest request);
-    List<HotelRoomDetailResponse> findRooms(Long hotelId);
-    HotelRoomDetailResponse getRoomDetail(Long hotelId, Long roomId);
-    void deleteRoom(Long hotelId, Long roomId);
-    HotelRoom getHotelRoomById(Long hotelId, Long roomId);
+  HotelDetailResponse getHotelDetail(Long id);
 
+  Hotel getHotelById(Long id);
 
+  List<HotelRoomDetailResponse> findRooms(Long hotelId);
+
+  HotelRoomDetailResponse getRoomDetail(Long hotelId, Long roomId);
+  HotelRoom getHotelRoomById(Long hotelId, Long roomId);
 }

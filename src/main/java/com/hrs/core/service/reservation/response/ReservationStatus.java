@@ -1,6 +1,6 @@
 package com.hrs.core.service.reservation.response;
 
-import reactor.util.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 import java.time.LocalDate;
 

@@ -1,17 +1,16 @@
 package com.hrs.core.service.hotel.response;
 
 import com.hrs.core.domain.hotel.Hotel;
-import java.util.Collections;
-import java.util.Optional;
+import java.io.Serializable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import reactor.util.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 @Getter
 @Setter
 @Builder
-public class HotelDetailResponse {
+public class HotelDetailResponse implements Serializable {
   private Long id;
   private String name;
   private String address;

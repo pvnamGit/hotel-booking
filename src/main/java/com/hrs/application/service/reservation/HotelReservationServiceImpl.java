@@ -26,14 +26,14 @@ import javax.persistence.PersistenceContext;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-import reactor.util.annotation.Nullable;
+
 
 @Service
 @AllArgsConstructor
 public class HotelReservationServiceImpl implements HotelReservationService {
-  private final HotelService hotelService;
   private final HotelReservationRepository hotelReservationRepository;
   private final HotelRoomRepository hotelRoomRepository;
   private final SecurityCurrentUser currentUser;
@@ -89,7 +89,8 @@ public class HotelReservationServiceImpl implements HotelReservationService {
 
     HotelReservation hotelReservation = hotelReservationRepository.findById(id);
     if (hotelReservation == null) throw new EntityNotFoundException();
-    if (hotelReservation.getCancelledAt() != null) throw new BadRequestException("Can't update cancelled reservation");
+    if (hotelReservation.getCancelledAt() != null)
+      throw new BadRequestException("Can't update cancelled reservation");
 
     GenericPatcher<HotelReservation> patcher = new GenericPatcher<>();
     HotelReservation hotelReservationUpdate =

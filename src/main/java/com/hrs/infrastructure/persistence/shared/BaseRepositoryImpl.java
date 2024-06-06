@@ -116,4 +116,15 @@ public abstract class BaseRepositoryImpl<T, ID extends Serializable>
     delete.where(cb.equal(root.get(IS_ACTIVE), true)); // Assuming "id" is the ID field
     entityManager.createQuery(delete).executeUpdate();
   }
+
+  @Transactional
+  @Override
+  public void deleteAll() {
+    CriteriaBuilder cb = getCriteriaBuilder();
+    CriteriaDelete<T> delete = cb.createCriteriaDelete(entityClass);
+    Root<T> root = delete.from(entityClass);
+
+    // No where clause needed to delete all entities
+    entityManager.createQuery(delete).executeUpdate();
+  }
 }

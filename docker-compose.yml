@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  hotel-booking:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pvnamgit/hotel-booking:latest
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env.docker
+    depends_on:
+      - postgresdb
+      - redis
+  postgresdb:
+    image: postgres:13-alpine3.19
+    restart: unless-stopped
+    container_name: postgres_db
+    env_file:
+      - .env.docker
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  redis:
+    image: redis:6
+
+volumes:
+  postgres-data:

@@ -38,7 +38,7 @@ public class HotelRepositoryImpl extends BaseRepositoryImpl<Hotel, Long>
   }
 
   @Override
-  public List<Hotel> findAvailableHotels(HotelSearchCriteria criteria) {
+  public List<Hotel> findHotels(HotelSearchCriteria criteria) {
     CriteriaBuilder cb = getCriteriaBuilder();
     CriteriaQuery cq = createCriteriaQuery();
     Root<Hotel> hotelRoot = cq.from(Hotel.class);
