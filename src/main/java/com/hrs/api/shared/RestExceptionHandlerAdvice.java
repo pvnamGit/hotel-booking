@@ -117,4 +117,14 @@ public class RestExceptionHandlerAdvice {
             new BaseErrorResponse(
                     ErrorCode.E009.getCode(), ErrorCode.E009.getMessage(), e.getLocalizedMessage(), null));
   }
+
+  @SneakyThrows
+  @ExceptionHandler(IllegalArgumentException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public BaseEntityResponse illegalArgumentException(IllegalArgumentException e) {
+    log.error("IllegalArgumentException {}", e.getMessage(), e);
+    return BaseEntityResponse.error(
+            new BaseErrorResponse(
+                    ErrorCode.E010.getCode(), ErrorCode.E010.getMessage(), e.getLocalizedMessage(), null));
+  }
 }
