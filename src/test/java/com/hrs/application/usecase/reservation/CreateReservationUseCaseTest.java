@@ -40,6 +40,7 @@ public class CreateReservationUseCaseTest {
   private User user;
   private Account account;
   private SecurityAccountDetails securityAccountDetails;
+  private final Long ID = 1L;
 
   @BeforeEach
   public void setUp() {
@@ -47,17 +48,17 @@ public class CreateReservationUseCaseTest {
 
     // Initialize common objects
     hotel = new Hotel();
-    hotel.setId(1L);
+    hotel.setId(ID);
 
     hotelRoom = new HotelRoom();
-    hotelRoom.setId(1L);
+    hotelRoom.setId(ID);
     hotelRoom.setPrice(100.00);
 
     user = new User();
-    user.setId(1L);
+    user.setId(ID);
 
     account = new Account();
-    account.setId(1L);
+    account.setId(ID);
     account.setEmail("test@gmail.com");
     account.setPassword("testPassword");
     account.setUser(user);
@@ -88,7 +89,7 @@ public class CreateReservationUseCaseTest {
 
     // Mock hotel reservation response
     HotelReservationDetailResponse expectedResponse =
-        HotelReservationDetailResponse.builder().id(1L).build();
+        HotelReservationDetailResponse.builder().id(ID).build();
 
     // Mock hotel reservation service behavior
     when(hotelReservationService.createReservation(request)).thenReturn(expectedResponse);

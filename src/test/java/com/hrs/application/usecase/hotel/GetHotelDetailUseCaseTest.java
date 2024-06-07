@@ -18,7 +18,7 @@ import org.mockito.quality.Strictness;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class GetHotelDetailUseCaseTest {
-  @InjectMocks GetHotelDetailUseCase useCase;
+  @InjectMocks GetHotelDetailUseCase getHotelDetailUseCase;
   @Mock private HotelRepository hotelRepository;
   @Mock private HotelService hotelService;
   private Hotel hotel;
@@ -40,7 +40,7 @@ public class GetHotelDetailUseCaseTest {
     Mockito.when(hotelRepository.findById(ID)).thenReturn(hotel);
     Mockito.when(hotelService.getHotelDetail(ID))
         .thenReturn(HotelDetailResponse.build(hotel));
-    HotelDetailResponse response = useCase.get(ID);
+    HotelDetailResponse response = getHotelDetailUseCase.getHotel(ID);
     Assertions.assertEquals(response.getId(), ID);
     Assertions.assertEquals(response.getName(), "Test Hotel");
   }
