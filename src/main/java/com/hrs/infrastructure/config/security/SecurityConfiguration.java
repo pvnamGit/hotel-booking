@@ -1,8 +1,8 @@
 package com.hrs.infrastructure.config.security;
 
-import java.util.List;
-
+import com.hrs.infrastructure.config.rate_limit.RateLimitFilter;
 import com.hrs.infrastructure.jwt.JwtAuthenticationFilter;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +40,8 @@ public class SecurityConfiguration {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authenticationProvider(authenticationProvider)
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(new RateLimitFilter(), UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 
