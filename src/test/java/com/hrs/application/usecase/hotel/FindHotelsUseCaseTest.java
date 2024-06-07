@@ -22,7 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-@ActiveProfiles(profiles = "test")
+@ActiveProfiles("test")
 public class FindHotelsUseCaseTest {
   @InjectMocks FindHotelsUseCase useCase;
   @Mock private HotelRepository hotelRepository;
@@ -31,13 +31,15 @@ public class FindHotelsUseCaseTest {
 
   @BeforeEach
   public void setup() {
-    hotel = Hotel.builder()
+    hotel =
+        Hotel.builder()
             .name("Test Hotel")
             .country("Test Country")
             .address("123 Test St")
             .city("Test City")
             .noOfAvailableRooms(50)
             .build();
+    hotel.setId(1L);
   }
 
   @Test

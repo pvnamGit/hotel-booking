@@ -7,7 +7,6 @@ import com.hrs.core.domain.reservation.HotelReservation;
 import com.hrs.core.domain.user.User;
 import com.hrs.core.repository.hotel.HotelRoomRepository;
 import com.hrs.core.repository.reservation.HotelReservationRepository;
-import com.hrs.core.service.hotel.HotelService;
 import com.hrs.core.service.reservation.HotelReservationService;
 import com.hrs.core.service.reservation.request.HotelReservationCreateRequest;
 import com.hrs.core.service.reservation.request.HotelReservationUpdateRequest;
@@ -24,12 +23,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-
 
 @Service
 @AllArgsConstructor
@@ -40,12 +37,15 @@ public class HotelReservationServiceImpl implements HotelReservationService {
   @PersistenceContext private EntityManager entityManager;
 
   @Override
-  @SneakyThrows
-  public HotelReservationDetailResponse createReservation(HotelReservationCreateRequest request) {
+  public HotelReservationDetailResponse createReservation(HotelReservationCreateRequest request)
+      throws BadRequestException {
     LocalDate checkInDate =
         DateFormat.parseDate(request.getCheckInDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
     LocalDate checkOutDate =
         DateFormat.parseDate(request.getCheckOutDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
+    if (hotelReservationRepository.isConflictReservation(
+        request.getHotelRoomId(), checkInDate, checkOutDate, null))
+      throw new BadRequestException("Reservation dates conflict with existing reservations.");
 
     validateCheckInAndCheckOut(checkInDate, checkOutDate);
 
@@ -69,11 +69,9 @@ public class HotelReservationServiceImpl implements HotelReservationService {
   }
 
   @Override
-  @SneakyThrows
   public HotelReservationDetailResponse updateReservation(
-      Long id, HotelReservationUpdateRequest request) {
-    if (!hotelReservationRepository.authorizeUser(id, currentUser.getCurrentUser().getUserId()))
-      throw new AccessDeniedException("Unauthorized");
+      Long id, HotelReservationUpdateRequest request) throws BadRequestException {
+    authorized(id);
     LocalDate checkInDate =
         DateFormat.parseDate(request.getCheckInDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
     LocalDate checkOutDate =
@@ -122,16 +120,18 @@ public class HotelReservationServiceImpl implements HotelReservationService {
   }
 
   @Override
-  public HotelReservationDetailResponse getReservationDetail(Long id) {
+  public HotelReservationDetailResponse getReservationDetail(Long id) throws EntityNotFoundException {
+    authorized(id);
     HotelReservation hotelReservation = hotelReservationRepository.findById(id);
+    if (hotelReservation == null) throw new EntityNotFoundException();
     return HotelReservationDetailResponse.build(hotelReservation);
   }
 
   @Override
-  public void cancelReservation(Long id) {
-    if (!hotelReservationRepository.authorizeUser(id, currentUser.getCurrentUser().getUserId()))
-      throw new AccessDeniedException("Unauthorized");
+  public void cancelReservation(Long id)  throws EntityNotFoundException {
+    authorized(id);
     var hotelReservation = hotelReservationRepository.findById(id);
+    if (hotelReservation == null) throw new EntityNotFoundException();
     hotelReservation.setCancelledAt(Instant.now().toEpochMilli());
     hotelReservation.setUpdatedAt(Instant.now().toEpochMilli());
     hotelReservationRepository.merge(hotelReservation);
@@ -145,11 +145,16 @@ public class HotelReservationServiceImpl implements HotelReservationService {
     return Double.parseDouble(df.format(totalPrice));
   }
 
-  @SneakyThrows
-  private void validateCheckInAndCheckOut(LocalDate checkInDate, LocalDate checkOutDate) {
+  private void validateCheckInAndCheckOut(LocalDate checkInDate, LocalDate checkOutDate)
+      throws BadRequestException {
     if (checkInDate.isBefore(LocalDate.now()))
       throw new BadRequestException("Check in date must be after current date");
     if (checkInDate.isAfter(checkOutDate))
       throw new BadRequestException("Check in date must be before check out date");
+  }
+
+  private void authorized(Long id) {
+    if (!hotelReservationRepository.authorizeUser(id, currentUser.getCurrentUser().getUserId()))
+      throw new AccessDeniedException("Unauthorized");
   }
 }

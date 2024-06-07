@@ -11,9 +11,8 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-@NoArgsConstructor
 public class FindHotelsUseCase {
-    private HotelService hotelService;
+    private final HotelService hotelService;
     public List<HotelDetailResponse> findHotelsByCriteria(HotelSearchCriteria searchCriteria) {
         return hotelService.findHotels(searchCriteria);
     }

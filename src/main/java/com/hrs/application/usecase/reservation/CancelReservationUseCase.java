@@ -4,12 +4,14 @@ import com.hrs.core.service.reservation.HotelReservationService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 @AllArgsConstructor
 public class CancelReservationUseCase {
   private final HotelReservationService hotelReservationService;
 
-  public void delete(Long id) {
+  public void cancel(Long id) throws EntityNotFoundException {
     hotelReservationService.cancelReservation(id);
   }
 }
