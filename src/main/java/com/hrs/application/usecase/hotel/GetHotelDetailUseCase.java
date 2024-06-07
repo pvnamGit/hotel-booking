@@ -8,8 +8,9 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class GetHotelDetailUseCase {
-    private final HotelService hotelService;
-    public HotelDetailResponse get(Long id) {
-        return hotelService.getHotelDetail(id);
-    }
+  private final HotelService hotelService;
+
+  public HotelDetailResponse getHotel(Long id) {
+    return hotelService.getHotelDetail(id);
+  }
 }

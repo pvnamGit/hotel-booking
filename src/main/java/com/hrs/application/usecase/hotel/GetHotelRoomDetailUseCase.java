@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class GetHotelRoomDetailUseCase {
   private final HotelService hotelService;
 
-  public HotelRoomDetailResponse get(Long hotelId, Long roomId) {
+  public HotelRoomDetailResponse getRoom(Long hotelId, Long roomId) {
     return hotelService.getRoomDetail(hotelId, roomId);
   }
 }

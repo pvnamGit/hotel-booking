@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-// import org.springframework.data.redis.core.RedisTemplate;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +52,7 @@ public class HotelServiceImpl implements HotelService {
   @Override
   public HotelRoomDetailResponse getRoomDetail(Long hotelId, Long roomId) {
     if (!hotelRoomRepository.validateHotelRoom(hotelId, roomId))
-      throw new BadRequestException("Room not belong to hotel");
+      throw new IllegalArgumentException("Room not belong to hotel");
     var room = hotelRoomRepository.findById(roomId);
     return HotelRoomDetailResponse.build(room);
   }

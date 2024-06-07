@@ -33,7 +33,7 @@ public class HotelRepositoryImpl extends BaseRepositoryImpl<Hotel, Long>
   @PersistenceContext EntityManager entityManager;
 
   @SuppressWarnings("unchecked")
-  public HotelRepositoryImpl(EntityManager entityManager) {
+  public HotelRepositoryImpl() {
     super(Hotel.class);
   }
 

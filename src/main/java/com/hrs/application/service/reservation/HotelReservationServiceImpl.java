@@ -65,6 +65,7 @@ public class HotelReservationServiceImpl implements HotelReservationService {
             .totalPrice(calculateTotalPrice(checkInDate, checkOutDate, hotelRoom.getPrice()))
             .build();
     hotelReservationRepository.persistAndFlush(hotelReservation);
+
     return HotelReservationDetailResponse.build(hotelReservation);
   }
 
