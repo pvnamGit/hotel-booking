@@ -29,4 +29,4 @@ COPY --from=builder /app/target/*.jar hotel-booking.jar
 EXPOSE 8080
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "hotel-booking.jar"]
+ENTRYPOINT ["java", "-jar","-Dspring.profiles.active=dev", "hotel-booking.jar"]

@@ -12,7 +12,6 @@ services:
       - .env.docker
     depends_on:
       - postgresdb
-      - redis
   postgresdb:
     image: postgres:13-alpine3.19
     restart: unless-stopped
@@ -23,8 +22,6 @@ services:
       - ./postgres-data:/var/lib/postgresql/data
     ports:
       - 5432:5432
-  redis:
-    image: redis:6
 
 volumes:
   postgres-data:
