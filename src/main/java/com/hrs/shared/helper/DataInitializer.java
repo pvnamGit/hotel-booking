@@ -9,6 +9,8 @@ import com.hrs.core.repository.account.AccountRepository;
 import com.hrs.core.repository.hotel.HotelRepository;
 import com.hrs.core.repository.hotel.HotelRoomRepository;
 import com.hrs.core.repository.user.UserRepository;
+
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -142,12 +144,16 @@ public class DataInitializer implements CommandLineRunner {
               IntStream.range(0, random.nextInt(10) + 1)
                   .forEach(
                       j -> {
+                          double price = 5 + (random.nextDouble() * (100 - 5));
+                          DecimalFormat df = new DecimalFormat("#.##");
+                          price = Double.parseDouble(df.format(price));
                         HotelRoom hotelRoom = new HotelRoom();
                         hotelRoom.setHotel(hotel);
                         hotelRoom.setCode("Room_" + (i + 1) + "_" + (j + 1));
                         hotelRoom.setNoOfBeds(random.nextInt(3) + 1);
                         hotelRoom.setNoOfBedrooms(random.nextInt(2) + 1);
                         hotelRoom.setNoOfBathrooms(random.nextInt(2) + 1);
+                        hotelRoom.setPrice(price);
                         hotelRoomRepository.persist(hotelRoom);
                       });
             });
