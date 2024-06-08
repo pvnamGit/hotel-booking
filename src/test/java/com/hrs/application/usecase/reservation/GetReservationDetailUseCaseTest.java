@@ -1,7 +1,6 @@
 package com.hrs.application.usecase.reservation;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 import com.hrs.core.domain.account.Account;
 import com.hrs.core.domain.account.Authority;
@@ -66,7 +65,6 @@ public class GetReservationDetailUseCaseTest {
 
   @Test
   public void testGetReservationDetailSuccess() {
-    // Mock current user
     HotelReservationDetailResponse response =
         getReservationDetailUseCase.getDetail(reservation.getId());
     assertNotNull(response);

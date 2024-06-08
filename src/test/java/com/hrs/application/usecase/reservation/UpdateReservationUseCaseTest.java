@@ -2,36 +2,18 @@ package com.hrs.application.usecase.reservation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
-import com.hrs.core.domain.account.Account;
-import com.hrs.core.domain.account.Authority;
-import com.hrs.core.domain.account.SecurityAccountDetails;
-import com.hrs.core.domain.account.SecurityCurrentUser;
-import com.hrs.core.domain.hotel.Hotel;
-import com.hrs.core.domain.hotel.HotelRoom;
-import com.hrs.core.domain.reservation.HotelReservation;
-import com.hrs.core.domain.user.User;
-import com.hrs.core.repository.hotel.HotelRoomRepository;
 import com.hrs.core.repository.reservation.HotelReservationRepository;
-import com.hrs.core.service.reservation.HotelReservationService;
 import com.hrs.core.service.reservation.request.HotelReservationCreateRequest;
 import com.hrs.core.service.reservation.request.HotelReservationUpdateRequest;
 import com.hrs.core.service.reservation.response.HotelReservationDetailResponse;
 import java.time.LocalDate;
-import javax.persistence.EntityManager;
-
-import com.hrs.shared.enums.DateFormat;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -74,9 +56,6 @@ public class UpdateReservationUseCaseTest {
 
   @Test
   public void testUpdateReservationSuccess() throws BadRequestException {
-    // Mock current user
-
-    // Mock hotel reservation update request
     HotelReservationUpdateRequest updateRequest = new HotelReservationUpdateRequest();
     updateRequest.setCheckInDate("02-08-2024");
     updateRequest.setCheckOutDate("04-08-2024");
@@ -94,28 +73,28 @@ public class UpdateReservationUseCaseTest {
 
   @Test
   public void testUpdateReservationDateConflict() throws BadRequestException {
-    // Mock current user
-    var newReservation = createReservationUseCase.create(
-        HotelReservationCreateRequest.builder()
-            .hotelId(ID)
-            .hotelRoomId(ID)
-            .checkInDate("01-08-2024")
-            .checkOutDate("05-08-2024")
-            .noOfGuests(2)
-            .build());
+    var newReservation =
+        createReservationUseCase.create(
+            HotelReservationCreateRequest.builder()
+                .hotelId(ID)
+                .hotelRoomId(ID)
+                .checkInDate("01-08-2024")
+                .checkOutDate("05-08-2024")
+                .noOfGuests(2)
+                .build());
 
     HotelReservationUpdateRequest updateRequest = new HotelReservationUpdateRequest();
     updateRequest.setCheckInDate("01-07-2024");
     updateRequest.setCheckOutDate("04-07-2024");
     updateRequest.setNoOfGuests(3);
     updateRequest.setHotelRoomId(ID);
-  // throw conflict reservation date with the reservation on setup
+    // throw conflict reservation date with the reservation on setup
     BadRequestException exception =
-            assertThrows(
-                    BadRequestException.class,
-                    () -> {
-                      updateReservationUseCase.update(newReservation.getId(), updateRequest);
-                    });
+        assertThrows(
+            BadRequestException.class,
+            () -> {
+              updateReservationUseCase.update(newReservation.getId(), updateRequest);
+            });
 
     assertEquals("Reservation dates conflict with existing reservations.", exception.getMessage());
   }

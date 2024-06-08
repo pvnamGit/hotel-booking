@@ -1,7 +1,6 @@
 package com.hrs.application.usecase.reservation;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 import com.hrs.core.repository.reservation.HotelReservationRepository;
 import com.hrs.core.service.reservation.request.HotelReservationCreateRequest;
