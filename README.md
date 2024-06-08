@@ -44,6 +44,9 @@ JWT_SECRET=
 JWT_EXPIRATION=604800000
 RATE_LIMIT=1
 RATE_TIMEOUT=1
+TEST_DB_NAME=
+TEST_DB_USER=
+TEST_DB_PASSWORD=
 ```
 
 #### 3. Importing Environment Variables into IDE:
@@ -63,6 +66,13 @@ Access the Application:
 This will start the application, and you can access it at the specified URL prefix (e.g., http://localhost:8080/api/v1).
 
 ### Running Tests:
+In `.env` file, add variables for profile test. For example:
+```
+TEST_DB_NAME=testdb
+TEST_DB_USER=sa
+TEST_DB_PASSWORD=password
+```
+
 To run the test cases for the application:
 
 Open a terminal in the project directory.
