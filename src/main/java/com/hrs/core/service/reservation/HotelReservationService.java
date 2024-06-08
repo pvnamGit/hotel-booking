@@ -23,5 +23,5 @@ public interface HotelReservationService {
 
   HotelReservationDetailResponse getReservationDetail(Long id) throws EntityNotFoundException;
 
-  void cancelReservation(Long id) throws EntityNotFoundException;
+  HotelReservationDetailResponse cancelReservation(Long id) throws EntityNotFoundException;
 }

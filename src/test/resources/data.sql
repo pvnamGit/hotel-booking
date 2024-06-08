@@ -13,7 +13,7 @@ INSERT INTO users (first_name, last_name, year_of_birth, phone, country_code, ci
 -- Insert into hotels
 INSERT INTO hotels (name, address, city, country, no_of_rooms, no_of_available_rooms, created_at, updated_at, is_active) VALUES
 ('Test Hotel 1', '123 Test St', 'Test City', 'Test Country', 100, 50, extract(epoch from now()) * 1000, extract(epoch from now()) * 1000, TRUE),
-('Test Hotel 2', '456 Sample Rd', 'Sample City', 'Sample Country', 80, 30, extract(epoch from now()) * 1000, extract(epoch from now()) * 1000, TRUE);
+('Test Hotel 2', '456 Sample Rd', 'Test City v2', 'Sample Country', 80, 30, extract(epoch from now()) * 1000, extract(epoch from now()) * 1000, TRUE);
 
 -- Insert into hotel_rooms
 INSERT INTO hotel_rooms (code, no_of_bedrooms, no_of_beds, no_of_bathrooms, price, no_of_guests, hotel_id, created_at, updated_at, is_active) VALUES

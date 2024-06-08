@@ -21,7 +21,7 @@ public class HotelController {
 
   private final FindHotelsUseCase findHotelsUseCase;
   private final GetHotelDetailUseCase getHotelDetailUseCase;
-  private final FindHotelRoomUseCase findHotelRoomUseCase;
+  private final FindHotelRoomsUseCase findHotelRoomsUseCase;
   private final GetHotelRoomDetailUseCase getHotelRoomDetailUseCase;
 
   @GetMapping()
@@ -47,7 +47,7 @@ public class HotelController {
   @GetMapping("/{id}/rooms")
   @Cacheable(value = "hotel_rooms", key = "#hotelId ?: 'default'")
   public BasePaginationResponse findHotelRooms(@PathVariable(name = "id") Long hotelId) {
-    List<HotelRoomDetailResponse> hotelRooms = findHotelRoomUseCase.find(hotelId);
+    List<HotelRoomDetailResponse> hotelRooms = findHotelRoomsUseCase.find(hotelId);
     return BasePaginationResponse.success(hotelRooms);
   }
 

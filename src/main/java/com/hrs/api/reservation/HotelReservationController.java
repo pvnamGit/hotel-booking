@@ -64,7 +64,7 @@ public class HotelReservationController {
   @DeleteMapping("/{id}")
   @CacheEvict(cacheNames = "reservations", key = "#id", beforeInvocation = true)
   public BaseEntityResponse deleteReservation(@PathVariable(name = "id") Long id) {
-    cancelReservationUseCase.cancel(id);
-    return BaseEntityResponse.success();
+    HotelReservationDetailResponse hotelReservation = cancelReservationUseCase.cancel(id);
+    return BaseEntityResponse.success(hotelReservation);
   }
 }

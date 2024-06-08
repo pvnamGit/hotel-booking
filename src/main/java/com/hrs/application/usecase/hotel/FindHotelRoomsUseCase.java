@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class FindHotelRoomUseCase {
+public class FindHotelRoomsUseCase {
   private final HotelService hotelService;
 
   public List<HotelRoomDetailResponse> find(Long hotelId) {

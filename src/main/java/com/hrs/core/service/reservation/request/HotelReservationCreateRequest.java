@@ -1,5 +1,6 @@
 package com.hrs.core.service.reservation.request;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import javax.validation.constraints.Pattern;
 
 @Setter
 @Getter
+@Builder
 public class HotelReservationCreateRequest {
     @NotNull
     private Long hotelId;

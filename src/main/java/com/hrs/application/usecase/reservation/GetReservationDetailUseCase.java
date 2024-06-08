@@ -5,12 +5,14 @@ import com.hrs.core.service.reservation.response.HotelReservationDetailResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 @AllArgsConstructor
 public class GetReservationDetailUseCase {
   private final HotelReservationService hotelReservationService;
 
-  public HotelReservationDetailResponse getDetail(Long id) {
+  public HotelReservationDetailResponse getDetail(Long id) throws EntityNotFoundException {
     return hotelReservationService.getReservationDetail(id);
   }
 }

@@ -126,6 +126,7 @@ public class DataInitializer implements CommandLineRunner {
     User user = User.builder().firstName("First").lastName("Last").account(account).build();
     userRepository.persist(user);
 
+
     IntStream.range(0, 100)
         .forEach(
             i -> {

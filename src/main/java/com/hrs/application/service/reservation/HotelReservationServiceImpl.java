@@ -82,12 +82,15 @@ public class HotelReservationServiceImpl implements HotelReservationService {
     if (hotelReservationRepository.isConflictReservation(
         request.getHotelRoomId(), checkInDate, checkOutDate, id))
       throw new BadRequestException("Reservation dates conflict with existing reservations.");
-    Long hotelId = hotelReservationRepository.getHotelIdByReservationId(id);
-    if (!hotelRoomRepository.validateHotelRoom(hotelId, request.getHotelRoomId()))
-      throw new BadRequestException("Room not belong to Hotel");
 
-    HotelReservation hotelReservation = hotelReservationRepository.findById(id);
-    if (hotelReservation == null) throw new EntityNotFoundException();
+    if (request.getHotelRoomId() != null) {
+      // if nor room id in request, assume that room belong to hotel
+      Long hotelId = hotelReservationRepository.getHotelIdByReservationId(id);
+      if (!hotelRoomRepository.validateHotelRoom(hotelId, request.getHotelRoomId()))
+        throw new BadRequestException("Room not belong to Hotel");
+    }
+
+    HotelReservation hotelReservation = getReservationById(id);
     if (hotelReservation.getCancelledAt() != null)
       throw new BadRequestException("Can't update cancelled reservation");
 
@@ -121,21 +124,21 @@ public class HotelReservationServiceImpl implements HotelReservationService {
   }
 
   @Override
-  public HotelReservationDetailResponse getReservationDetail(Long id) throws EntityNotFoundException {
+  public HotelReservationDetailResponse getReservationDetail(Long id)
+      throws EntityNotFoundException, AccessDeniedException {
     authorized(id);
-    HotelReservation hotelReservation = hotelReservationRepository.findById(id);
-    if (hotelReservation == null) throw new EntityNotFoundException();
+    HotelReservation hotelReservation = getReservationById(id);
     return HotelReservationDetailResponse.build(hotelReservation);
   }
 
   @Override
-  public void cancelReservation(Long id)  throws EntityNotFoundException {
+  public HotelReservationDetailResponse cancelReservation(Long id) throws EntityNotFoundException {
     authorized(id);
-    var hotelReservation = hotelReservationRepository.findById(id);
-    if (hotelReservation == null) throw new EntityNotFoundException();
+    HotelReservation hotelReservation = getReservationById(id);
     hotelReservation.setCancelledAt(Instant.now().toEpochMilli());
     hotelReservation.setUpdatedAt(Instant.now().toEpochMilli());
     hotelReservationRepository.merge(hotelReservation);
+    return HotelReservationDetailResponse.build(hotelReservation);
   }
 
   private Double calculateTotalPrice(
@@ -154,8 +157,14 @@ public class HotelReservationServiceImpl implements HotelReservationService {
       throw new BadRequestException("Check in date must be before check out date");
   }
 
-  private void authorized(Long id) {
+  private void authorized(Long id) throws EntityNotFoundException, AccessDeniedException {
     if (!hotelReservationRepository.authorizeUser(id, currentUser.getCurrentUser().getUserId()))
       throw new AccessDeniedException("Unauthorized");
+  }
+
+  private HotelReservation getReservationById(Long id) {
+    HotelReservation reservation = hotelReservationRepository.findById(id);
+    if (reservation == null) throw new EntityNotFoundException();
+    return reservation;
   }
 }

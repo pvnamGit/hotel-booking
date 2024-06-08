@@ -1,17 +1,14 @@
 package com.hrs.infrastructure.persistence.reservation;
 
 import com.hrs.core.domain.hotel.Hotel;
-import com.hrs.core.domain.hotel.HotelRoom;
 import com.hrs.core.domain.reservation.HotelReservation;
 import com.hrs.core.domain.user.User;
 import com.hrs.core.repository.reservation.HotelReservationRepository;
 import com.hrs.infrastructure.persistence.shared.BaseRepositoryImpl;
-
-import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
@@ -34,6 +31,7 @@ public class HotelReservationRepositoryImpl extends BaseRepositoryImpl<HotelRese
   @Override
   public boolean isConflictReservation(
       Long roomId, LocalDate checkInDate, LocalDate checkOutDate, Long excludeReservationId) {
+    if (roomId == null) return false;
     CriteriaBuilder cb = getCriteriaBuilder();
     CriteriaQuery cq = createCriteriaQuery();
     Root<HotelReservation> reservationRoot = cq.from(HotelReservation.class);
@@ -71,7 +69,9 @@ public class HotelReservationRepositoryImpl extends BaseRepositoryImpl<HotelRese
   }
 
   @Override
-  public boolean authorizeUser(Long reservationId, Long userId) {
+  public boolean authorizeUser(Long reservationId, Long userId) throws EntityNotFoundException {
+    var reservation = findById(reservationId);
+    if (reservation == null) throw new EntityNotFoundException();
     // Initialize the CriteriaBuilder and CriteriaQuery
     CriteriaBuilder cb = getCriteriaBuilder();
     CriteriaQuery<Long> cq = cb.createQuery(Long.class);
@@ -97,13 +97,19 @@ public class HotelReservationRepositoryImpl extends BaseRepositoryImpl<HotelRese
     CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     CriteriaQuery<HotelReservation> cq = cb.createQuery(HotelReservation.class);
 
-
     Root<HotelReservation> reservationRoot = cq.from(HotelReservation.class);
-    Join<HotelReservation, User> userJoin = reservationRoot.join("user", JoinType.INNER); // Assuming "user" is the name of the association field in HotelReservation entity
-    Predicate predicate = cb.equal(userJoin.get("id"), userId); // Assuming "id" is the name of the primary key field in User entity
+    Join<HotelReservation, User> userJoin =
+        reservationRoot.join(
+            "user",
+            JoinType
+                .INNER); // Assuming "user" is the name of the association field in HotelReservation
+                         // entity
+    Predicate predicate =
+        cb.equal(
+            userJoin.get("id"),
+            userId); // Assuming "id" is the name of the primary key field in User entity
     cq.where(predicate);
     TypedQuery<HotelReservation> query = entityManager.createQuery(cq);
     return query.getResultList();
   }
-
 }

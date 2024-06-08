@@ -57,7 +57,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   }
 
   @Override
-  @SneakyThrows
   public AuthenticationRESP signIn(SignInREQ req) {
     Account account = accountRepository.findByEmail(req.getEmail());
     if (account == null) throw new EntityNotFoundException("Email not found");
