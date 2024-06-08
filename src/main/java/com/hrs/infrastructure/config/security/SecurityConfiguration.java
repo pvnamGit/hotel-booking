@@ -20,7 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @AllArgsConstructor
 public class SecurityConfiguration {
-  private final String PERMIT_REQUEST = "/api/v1/auth/**";
+  private final String[] PERMIT_REQUESTS = {"/api/v1/auth/**", "/api/v1/hotels/**"};
   private final AuthenticationProvider authenticationProvider;
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -31,7 +31,7 @@ public class SecurityConfiguration {
         .cors()
         .disable()
         .authorizeRequests()
-        .antMatchers(PERMIT_REQUEST)
+        .antMatchers(PERMIT_REQUESTS)
         .permitAll()
         .anyRequest()
         .authenticated()
