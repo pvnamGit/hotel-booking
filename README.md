@@ -25,7 +25,7 @@ To clone this project from GitHub, follow these steps:
 
 _Clone Repository:_
 ```
-git clone https://github.com/pvnamGit/hotel-booking`
+git clone https://github.com/pvnamGit/hotel-booking
 ```
 _Navigate to Project Directory:_
 ```
