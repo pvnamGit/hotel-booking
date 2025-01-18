@@ -1,19 +1,18 @@
 package com.hrs.application.service.hotel;
 
+import com.hrs.application.dto.hotel.request.HotelSearchCriteria;
 import com.hrs.core.domain.hotel.Hotel;
 import com.hrs.core.domain.hotel.HotelRoom;
 import com.hrs.core.repository.hotel.HotelRepository;
 import com.hrs.core.repository.hotel.HotelRoomRepository;
 import com.hrs.core.service.hotel.HotelService;
-import com.hrs.core.service.hotel.request.*;
-import com.hrs.core.service.hotel.response.HotelDetailResponse;
-import com.hrs.core.service.hotel.response.HotelRoomDetailResponse;
+import com.hrs.application.dto.hotel.response.HotelDetailResponse;
+import com.hrs.application.dto.hotel.response.HotelRoomDetailResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,7 +27,7 @@ public class HotelServiceImpl implements HotelService {
     List<Hotel> hotels = hotelRepository.findHotels(searchCriteria);
 
     return hotels.stream()
-        .map(hotel -> HotelDetailResponse.build(hotel))
+        .map(HotelDetailResponse::build)
         .collect(Collectors.toList());
   }
 
@@ -44,7 +43,7 @@ public class HotelServiceImpl implements HotelService {
   public List<HotelRoomDetailResponse> findRooms(Long hotelId) {
     List<HotelRoom> hotelRooms = hotelRoomRepository.findByHotelId(hotelId);
     return hotelRooms.stream()
-        .map(room -> HotelRoomDetailResponse.build(room))
+        .map(HotelRoomDetailResponse::build)
         .collect(Collectors.toList());
   }
 

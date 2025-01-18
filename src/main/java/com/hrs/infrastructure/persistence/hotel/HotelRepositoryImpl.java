@@ -4,7 +4,7 @@ import com.hrs.core.domain.hotel.Hotel;
 import com.hrs.core.domain.hotel.HotelRoom;
 import com.hrs.core.domain.reservation.HotelReservation;
 import com.hrs.core.repository.hotel.HotelRepository;
-import com.hrs.core.service.hotel.request.HotelSearchCriteria;
+import com.hrs.application.dto.hotel.request.HotelSearchCriteria;
 import com.hrs.infrastructure.persistence.shared.BaseRepositoryImpl;
 import com.hrs.shared.enums.DateFormat;
 import java.time.LocalDate;

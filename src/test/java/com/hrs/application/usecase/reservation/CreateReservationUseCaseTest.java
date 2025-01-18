@@ -2,9 +2,10 @@ package com.hrs.application.usecase.reservation;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.hrs.application.dto.reservation.request.HotelReservationCreateRequest;
+import com.hrs.application.dto.reservation.response.HotelReservationDetailResponse;
 import com.hrs.core.repository.reservation.HotelReservationRepository;
-import com.hrs.core.service.reservation.request.HotelReservationCreateRequest;
-import com.hrs.core.service.reservation.response.HotelReservationDetailResponse;
+import com.hrs.shared.enums.DateFormat;
 import java.time.LocalDate;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.AfterEach;
@@ -22,10 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 public class CreateReservationUseCaseTest {
+  LocalDate checkInDate, checkOutDate;
+  String checkInDateRequest, checkOutDateRequest;
   @Autowired private CreateReservationUseCase createReservationUseCase;
   @Autowired private AuthenticationManager authenticationManager;
   @Autowired private HotelReservationRepository hotelReservationRepository;
-
   private HotelReservationCreateRequest request;
 
   @AfterEach
@@ -35,12 +37,16 @@ public class CreateReservationUseCaseTest {
 
   @BeforeEach
   public void setUp() {
+    checkInDate = LocalDate.now().plusDays(1).plusMonths(1);
+    checkOutDate = LocalDate.now().plusDays(10).plusMonths(1);
+    checkInDateRequest = checkInDate.format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter());
+    checkOutDateRequest  = checkOutDate.format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter());
     request =
         HotelReservationCreateRequest.builder()
             .hotelId(1L)
             .hotelRoomId(1L)
-            .checkInDate("01-07-2024")
-            .checkOutDate("05-07-2024")
+            .checkInDate(checkInDateRequest)
+            .checkOutDate(checkOutDateRequest)
             .noOfGuests(2)
             .build();
     var auth =
@@ -54,10 +60,9 @@ public class CreateReservationUseCaseTest {
   public void testCreateReservationSuccess() throws BadRequestException {
 
     HotelReservationDetailResponse result = createReservationUseCase.create(request);
-
     assertNotNull(result);
-    assertEquals(LocalDate.of(2024, 7, 1), result.getCheckInDate());
-    assertEquals(LocalDate.of(2024, 7, 5), result.getCheckOutDate());
+    assertEquals(checkInDate, result.getCheckInDate());
+    assertEquals(checkOutDate, result.getCheckOutDate());
     assertEquals(2, result.getNoOfGuests());
   }
 
@@ -68,8 +73,8 @@ public class CreateReservationUseCaseTest {
         HotelReservationCreateRequest.builder()
             .hotelId(1L)
             .hotelRoomId(1L)
-            .checkInDate("02-07-2024")
-            .checkOutDate("04-07-2024")
+            .checkInDate(checkInDateRequest)
+            .checkOutDate(checkInDateRequest)
             .noOfGuests(2)
             .build();
     createReservationUseCase.create(initialRequest);
@@ -96,6 +101,63 @@ public class CreateReservationUseCaseTest {
               createReservationUseCase.create(request);
             });
 
-    assertEquals("Room not belong to Hotel", exception.getMessage());
+    assertEquals("Room does not belong to the hotel", exception.getMessage());
+  }
+
+  @Test
+  public void testCreateReservationInvalidCheckInBeforeToday() {
+    // Set the check-in date to a past date
+    request.setCheckInDate(LocalDate.now().minusDays(1)
+            .format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter()));
+
+    BadRequestException exception = assertThrows(
+            BadRequestException.class,
+            () -> {
+              createReservationUseCase.create(request);
+            }
+    );
+
+    assertEquals("Check in date must be larger or equal to the current date", exception.getMessage());
+  }
+
+  @Test
+  public void testCreateReservationCheckInAfterCheckOut() {
+    // Set the check-in date to a date after the check-out date
+    request.setCheckInDate(LocalDate.now().plusDays(5)
+            .format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter()));
+    request.setCheckOutDate(LocalDate.now().plusDays(3)
+            .format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter()));
+
+    BadRequestException exception = assertThrows(
+            BadRequestException.class,
+            () -> {
+              createReservationUseCase.create(request);
+            }
+    );
+
+    assertEquals("Check in date must be before check out date", exception.getMessage());
+  }
+
+  @Test
+  public void testCreateReservationWithSameCheckInAndCheckOut() {
+    // Set the check-in date equal to the check-out date
+    request.setCheckInDate(LocalDate.now().plusDays(3)
+            .format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter()));
+    request.setCheckOutDate(LocalDate.now().plusDays(3)
+            .format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter()));
+
+    // Assuming same-day check-in and check-out is allowed; otherwise, update exception message accordingly
+    assertDoesNotThrow(() -> createReservationUseCase.create(request));
+  }
+
+  @Test
+  public void testCreateReservationWithValidFutureDates() {
+    // Set the check-in and check-out dates to valid future dates
+    request.setCheckInDate(LocalDate.now().plusDays(10)
+            .format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter()));
+    request.setCheckOutDate(LocalDate.now().plusDays(15)
+            .format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter()));
+
+    assertDoesNotThrow(() -> createReservationUseCase.create(request));
   }
 }
