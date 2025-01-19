@@ -1,10 +1,9 @@
 package com.hrs.core.service.reservation;
 
-import com.hrs.core.service.reservation.request.HotelReservationCreateRequest;
-import com.hrs.core.service.reservation.request.HotelReservationUpdateRequest;
-import com.hrs.core.service.reservation.response.HotelReservationDetailResponse;
+import com.hrs.application.dto.reservation.request.HotelReservationCreateRequest;
+import com.hrs.application.dto.reservation.request.HotelReservationUpdateRequest;
+import com.hrs.application.dto.reservation.response.HotelReservationDetailResponse;
 import org.apache.coyote.BadRequestException;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;

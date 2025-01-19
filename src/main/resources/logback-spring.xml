@@ -1,0 +1,94 @@
+<configuration debug="true">
+    <!-- Console Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd'T'HH:mm:ss.sss'Z'}] [%C] [%t] [%L] [%-5p] %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- File Appender (writes logs to a file) -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Path to the log file -->
+        <file>logs/main.log</file>
+
+        <!-- Rolling policy (daily rotation and size limit) -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/main.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory> <!-- Keep logs for 7 days -->
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Application Appender -->
+    <appender name="APPLICATION_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/application.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/application.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Hotel Appender -->
+    <appender name="HOTEL_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/hotel.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/hotel.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    </appender>
+
+    <!-- Hotel Reservation Appender -->
+    <appender name="HOTEL_RESERVATION_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/hotel_reservation.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/hotel_reservation.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    </appender>
+
+    <!-- Authorization Appender -->
+    <appender name="AUTHORIZATION_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/authorization.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/authorization.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    </appender>
+
+    <!-- Logger for Application -->
+    <logger name="com.hrs.adapter.api.shared" level="DEBUG" additivity="false">
+        <appender-ref ref="APPLICATION_APPENDER" />
+        <appender-ref ref="CONSOLE" />
+    </logger>
+
+    <!-- Logger for Hotel -->
+    <logger name="com.hrs.application.service.hotel" level="DEBUG" additivity="false">
+        <appender-ref ref="HOTEL_APPENDER" />
+    </logger>
+
+    <!-- Logger for Hotel Reservation -->
+    <logger name="com.hrs.application.service.reservation" level="DEBUG" additivity="false">
+        <appender-ref ref="HOTEL_RESERVATION_APPENDER" />
+    </logger>
+
+    <!-- Logger for Authorization -->
+    <logger name="com.hrs.application.service.authorization" level="DEBUG" additivity="false">
+        <appender-ref ref="AUTHORIZATION_APPENDER" />
+    </logger>
+
+    <!-- Root logger configuration -->
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>

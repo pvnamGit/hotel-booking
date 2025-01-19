@@ -1,13 +1,10 @@
 package com.hrs.core.service.hotel;
 
+import com.hrs.application.dto.hotel.request.HotelSearchCriteria;
 import com.hrs.core.domain.hotel.Hotel;
 import com.hrs.core.domain.hotel.HotelRoom;
-import com.hrs.core.service.hotel.request.*;
-import com.hrs.core.service.hotel.response.HotelDetailResponse;
-import com.hrs.core.service.hotel.response.HotelRoomDetailResponse;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+import com.hrs.application.dto.hotel.response.HotelDetailResponse;
+import com.hrs.application.dto.hotel.response.HotelRoomDetailResponse;
 
 import java.util.List;
 

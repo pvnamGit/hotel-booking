@@ -1,15 +1,16 @@
 package com.hrs.application.service.authentication;
 
+import com.hrs.application.dto.authentication.request.SignInRequest;
+import com.hrs.application.dto.authentication.request.SignUpRequest;
+import com.hrs.application.dto.authentication.response.AuthenticationResponse;
 import com.hrs.core.domain.account.Account;
 import com.hrs.core.domain.account.Authority;
 import com.hrs.core.domain.account.SecurityAccountDetails;
 import com.hrs.core.domain.user.User;
+import com.hrs.core.exception.authorization.AuthorizationErrorMessage;
 import com.hrs.core.repository.account.AccountRepository;
 import com.hrs.core.repository.user.UserRepository;
 import com.hrs.core.service.authentication.AuthenticationService;
-import com.hrs.core.service.authentication.request.SignInREQ;
-import com.hrs.core.service.authentication.request.SignUpREQ;
-import com.hrs.core.service.authentication.response.AuthenticationRESP;
 import com.hrs.core.service.jwt.JwtService;
 import javax.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -35,7 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Override
   @Transactional
   @SneakyThrows
-  public void registerAccount(SignUpREQ signUpRequest) throws ConstraintViolationException {
+  public void registerAccount(SignUpRequest signUpRequest) throws ConstraintViolationException {
     try {
       Account account =
           Account.builder()
@@ -52,12 +53,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
               .build();
       userRepository.persist(user);
     } catch (DataIntegrityViolationException exception) {
-      throw new DataIntegrityViolationException("Email is already registered");
+      throw new DataIntegrityViolationException(
+          AuthorizationErrorMessage.EMAIL_REGISTERED.getMessage());
     }
   }
 
   @Override
-  public AuthenticationRESP signIn(SignInREQ req) {
+  public AuthenticationResponse signIn(SignInRequest req) {
     Account account = accountRepository.findByEmail(req.getEmail());
     if (account == null) throw new EntityNotFoundException("Email not found");
     try {
@@ -69,6 +71,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     SecurityAccountDetails accountDetails = SecurityAccountDetails.build(account);
     String token = jwtService.generateToken(accountDetails);
-    return AuthenticationRESP.builder().token(token).build();
+    return AuthenticationResponse.builder().token(token).build();
   }
 }

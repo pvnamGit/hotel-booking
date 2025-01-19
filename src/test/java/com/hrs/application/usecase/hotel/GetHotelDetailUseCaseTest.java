@@ -2,8 +2,8 @@ package com.hrs.application.usecase.hotel;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.hrs.core.service.hotel.request.HotelSearchCriteria;
-import com.hrs.core.service.hotel.response.HotelDetailResponse;
+import com.hrs.application.dto.hotel.request.HotelSearchCriteria;
+import com.hrs.application.dto.hotel.response.HotelDetailResponse;
 import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;

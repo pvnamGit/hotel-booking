@@ -1,11 +1,11 @@
 package com.hrs.core.service.authentication;
 
-import com.hrs.core.service.authentication.request.SignInREQ;
-import com.hrs.core.service.authentication.request.SignUpREQ;
-import com.hrs.core.service.authentication.response.AuthenticationRESP;
+import com.hrs.application.dto.authentication.request.SignInRequest;
+import com.hrs.application.dto.authentication.request.SignUpRequest;
+import com.hrs.application.dto.authentication.response.AuthenticationResponse;
 import org.hibernate.exception.ConstraintViolationException;
 
 public interface AuthenticationService {
-    void registerAccount(SignUpREQ signUpRequest) throws ConstraintViolationException;
-    AuthenticationRESP signIn(SignInREQ req);
+    void registerAccount(SignUpRequest signUpRequest) throws ConstraintViolationException;
+    AuthenticationResponse signIn(SignInRequest req);
 }

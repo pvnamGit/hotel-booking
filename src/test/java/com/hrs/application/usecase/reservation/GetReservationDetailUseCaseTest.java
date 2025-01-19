@@ -8,10 +8,12 @@ import com.hrs.core.domain.user.User;
 import com.hrs.core.repository.account.AccountRepository;
 import com.hrs.core.repository.reservation.HotelReservationRepository;
 import com.hrs.core.repository.user.UserRepository;
-import com.hrs.core.service.reservation.request.HotelReservationCreateRequest;
-import com.hrs.core.service.reservation.response.HotelReservationDetailResponse;
+import com.hrs.application.dto.reservation.request.HotelReservationCreateRequest;
+import com.hrs.application.dto.reservation.response.HotelReservationDetailResponse;
 import java.time.LocalDate;
 import javax.persistence.EntityNotFoundException;
+
+import com.hrs.shared.enums.DateFormat;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,9 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class GetReservationDetailUseCaseTest {
   private final Long ID = 1L;
+
+  LocalDate checkInDate, checkOutDate;
+  String checkInDateRequest, checkOutDateRequest;
   @Autowired private GetReservationDetailUseCase getReservationDetailUseCase;
   @Autowired private UpdateReservationUseCase updateReservationUseCase;
   @Autowired private CreateReservationUseCase createReservationUseCase;
@@ -47,12 +52,17 @@ public class GetReservationDetailUseCaseTest {
 
   @BeforeEach
   public void setUp() throws BadRequestException {
+    checkInDate = LocalDate.now().plusDays(1).plusMonths(1);
+    checkOutDate = LocalDate.now().plusDays(10).plusMonths(1);
+    checkInDateRequest = checkInDate.format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter());
+    checkOutDateRequest  = checkOutDate.format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter());
+
     HotelReservationCreateRequest request =
         HotelReservationCreateRequest.builder()
             .hotelId(ID)
             .hotelRoomId(ID)
-            .checkInDate("01-07-2024")
-            .checkOutDate("05-07-2024")
+            .checkInDate(checkInDateRequest)
+            .checkOutDate(checkOutDateRequest)
             .noOfGuests(2)
             .build();
     var auth =
@@ -68,8 +78,8 @@ public class GetReservationDetailUseCaseTest {
     HotelReservationDetailResponse response =
         getReservationDetailUseCase.getDetail(reservation.getId());
     assertNotNull(response);
-    assertEquals(LocalDate.of(2024, 7, 1), response.getCheckInDate());
-    assertEquals(LocalDate.of(2024, 7, 5), response.getCheckOutDate());
+    assertEquals(checkInDate, response.getCheckInDate());
+    assertEquals(checkOutDate, response.getCheckOutDate());
     assertEquals(2, response.getNoOfGuests());
   }
 

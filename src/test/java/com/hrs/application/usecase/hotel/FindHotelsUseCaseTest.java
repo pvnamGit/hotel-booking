@@ -1,8 +1,8 @@
 package com.hrs.application.usecase.hotel;
 
-import com.hrs.core.service.hotel.request.HotelSearchCriteria;
+import com.hrs.application.dto.hotel.request.HotelSearchCriteria;
 
-import com.hrs.core.service.hotel.response.HotelDetailResponse;
+import com.hrs.application.dto.hotel.response.HotelDetailResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

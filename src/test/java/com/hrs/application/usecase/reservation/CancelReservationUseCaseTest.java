@@ -3,9 +3,10 @@ package com.hrs.application.usecase.reservation;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.hrs.core.repository.reservation.HotelReservationRepository;
-import com.hrs.core.service.reservation.request.HotelReservationCreateRequest;
-import com.hrs.core.service.reservation.response.HotelReservationDetailResponse;
-import com.hrs.core.service.reservation.response.ReservationStatus;
+import com.hrs.application.dto.reservation.request.HotelReservationCreateRequest;
+import com.hrs.application.dto.reservation.response.HotelReservationDetailResponse;
+import com.hrs.application.dto.reservation.response.ReservationStatus;
+import com.hrs.shared.enums.DateFormat;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,11 +18,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDate;
+
 @SpringBootTest
 @ActiveProfiles("test")
 public class CancelReservationUseCaseTest {
 
   private final Long ID = 1L;
+  LocalDate checkInDate, checkOutDate;
+  String checkInDateRequest, checkOutDateRequest;
   @Autowired private CancelReservationUseCase cancelReservationUseCase;
   @Autowired private CreateReservationUseCase createReservationUseCase;
   @Autowired private AuthenticationManager authenticationManager;
@@ -36,12 +41,16 @@ public class CancelReservationUseCaseTest {
 
   @BeforeEach
   public void setUp() throws BadRequestException {
+    checkInDate = LocalDate.now().plusDays(1).plusMonths(1);
+    checkOutDate = LocalDate.now().plusDays(10).plusMonths(1);
+    checkInDateRequest = checkInDate.format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter());
+    checkOutDateRequest  = checkOutDate.plusMonths(1).format(DateFormat.DATE_FORMAT_DD_MM_YYYY.getFormatter());
     HotelReservationCreateRequest request =
         HotelReservationCreateRequest.builder()
             .hotelId(ID)
             .hotelRoomId(ID)
-            .checkInDate("01-07-2024")
-            .checkOutDate("05-07-2024")
+            .checkInDate(checkInDateRequest)
+            .checkOutDate(checkOutDateRequest)
             .noOfGuests(2)
             .build();
     var auth =
