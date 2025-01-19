@@ -9,6 +9,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,55 +25,56 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
-@Slf4j
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RestExceptionHandlerAdvice {
+
+  private final Logger logger = LoggerFactory.getLogger(RestExceptionHandlerAdvice.class);
 
   @SneakyThrows
   @ExceptionHandler(EntityNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public BaseEntityResponse entityNotFoundException(EntityNotFoundException e) {
-    log.error("EntityNotFoundException {}", e.getMessage(), e);
+    logger.error("EntityNotFoundException {}", e.getLocalizedMessage(), e);
     return BaseEntityResponse.error(
         new BaseErrorResponse(
-            ErrorCode.E004.getCode(), ErrorCode.E004.getMessage(), e.getMessage(), null));
+            ErrorCode.E004.getCode(), ErrorCode.E004.getMessage(), e.getLocalizedMessage(), null));
   }
 
   @SneakyThrows
   @ExceptionHandler(BadRequestException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public BaseEntityResponse badRequestException(BadRequestException e) {
-    log.error("BadRequestException {}", e.getMessage(), e);
+    logger.error("BadRequestException {}", e.getLocalizedMessage(), e);
     return BaseEntityResponse.error(
         new BaseErrorResponse(
-            ErrorCode.E002.getCode(), ErrorCode.E002.getMessage(), e.getMessage(), null));
+            ErrorCode.E002.getCode(), ErrorCode.E002.getMessage(), e.getLocalizedMessage(), null));
   }
 
   @SneakyThrows
   @ExceptionHandler(AccessDeniedException.class)
   @ResponseStatus(HttpStatus.FORBIDDEN)
   public BaseEntityResponse forbiddenException(AccessDeniedException e) {
-    log.error("AccessDeniedException {}", e.getMessage(), e);
+    logger.error("AccessDeniedException {}", e.getLocalizedMessage(), e);
     return BaseEntityResponse.error(
         new BaseErrorResponse(
-            ErrorCode.E003.getCode(), ErrorCode.E003.getMessage(), e.getMessage(), null));
+            ErrorCode.E003.getCode(), ErrorCode.E003.getMessage(), e.getLocalizedMessage(), null));
   }
 
   @SneakyThrows
   @ExceptionHandler(AuthenticationException.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public BaseEntityResponse authenticateException(AuthenticationException e) {
-    log.error("AuthenticationException {}", e.getMessage(), e);
+    logger.error("AuthenticationException {}", e.getLocalizedMessage(), e);
     return BaseEntityResponse.error(
         new BaseErrorResponse(
-            ErrorCode.E001.getCode(), ErrorCode.E001.getMessage(), e.getMessage(), null));
+            ErrorCode.E001.getCode(), ErrorCode.E001.getMessage(), e.getLocalizedMessage(), null));
   }
 
   @SneakyThrows
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public BaseEntityResponse invalidPayloadException(MethodArgumentNotValidException e) {
-    log.error("MethodArgumentNotValidException {}", e.getMessage(), e);
+    logger.error("MethodArgumentNotValidException {}", e.getLocalizedMessage(), e);
     List<String> errors =
         e.getBindingResult().getFieldErrors().stream()
             .map(FieldError::getDefaultMessage)
@@ -84,7 +87,7 @@ public class RestExceptionHandlerAdvice {
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public BaseEntityResponse generalException(Exception e) {
-    log.error("Exception {}", e.getMessage(), e);
+    logger.error("Exception {}", e.getLocalizedMessage(), e);
     return BaseEntityResponse.error(
         new BaseErrorResponse(ErrorCode.E005.getCode(), ErrorCode.E005.getMessage(), null, null));
   }
@@ -93,17 +96,17 @@ public class RestExceptionHandlerAdvice {
   @ExceptionHandler(ConstraintViolationException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
   public BaseEntityResponse constraintViolationException(ConstraintViolationException e) {
-    log.error("ConstraintViolationException {}", e.getMessage(), e);
+    logger.error("ConstraintViolationException {}", e.getLocalizedMessage(), e);
     return BaseEntityResponse.error(
         new BaseErrorResponse(
-            ErrorCode.E007.getCode(), ErrorCode.E007.getMessage(), e.getMessage(), null));
+            ErrorCode.E007.getCode(), ErrorCode.E007.getMessage(), e.getLocalizedMessage(), null));
   }
 
   @SneakyThrows
   @ExceptionHandler(BadCredentialsException.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public BaseEntityResponse badCredentialsException(BadCredentialsException e) {
-    log.error("BadCredentialsException {}", e.getMessage(), e);
+    logger.error("BadCredentialsException {}", e.getLocalizedMessage(), e);
     return BaseEntityResponse.error(
         new BaseErrorResponse(ErrorCode.E008.getCode(), ErrorCode.E008.getMessage(), null, null));
   }
@@ -112,7 +115,7 @@ public class RestExceptionHandlerAdvice {
   @ExceptionHandler(DataIntegrityViolationException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
   public BaseEntityResponse dataIntegrityViolationException(DataIntegrityViolationException e) {
-    log.error("DataIntegrityViolationException {}", e.getMessage(), e);
+    logger.error("DataIntegrityViolationException {}", e.getLocalizedMessage(), e);
     return BaseEntityResponse.error(
             new BaseErrorResponse(
                     ErrorCode.E009.getCode(), ErrorCode.E009.getMessage(), e.getLocalizedMessage(), null));
@@ -122,7 +125,7 @@ public class RestExceptionHandlerAdvice {
   @ExceptionHandler(IllegalArgumentException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
   public BaseEntityResponse illegalArgumentException(IllegalArgumentException e) {
-    log.error("IllegalArgumentException {}", e.getMessage(), e);
+    logger.error("IllegalArgumentException {}", e.getLocalizedMessage(), e);
     return BaseEntityResponse.error(
             new BaseErrorResponse(
                     ErrorCode.E010.getCode(), ErrorCode.E010.getMessage(), e.getLocalizedMessage(), null));

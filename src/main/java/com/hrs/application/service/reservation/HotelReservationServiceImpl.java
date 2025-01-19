@@ -26,6 +26,8 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class HotelReservationServiceImpl implements HotelReservationService {
+  private static final Logger logger = LoggerFactory.getLogger(HotelReservationServiceImpl.class);
   private final HotelReservationRepository hotelReservationRepository;
   private final HotelRoomRepository hotelRoomRepository;
   private final SecurityCurrentUser currentUser;
@@ -46,12 +49,14 @@ public class HotelReservationServiceImpl implements HotelReservationService {
         DateFormat.parseDate(request.getCheckInDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
     LocalDate checkOutDate =
         DateFormat.parseDate(request.getCheckOutDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
-    if (hotelReservationRepository.isConflictReservation(
-        request.getHotelRoomId(), checkInDate, checkOutDate, null))
-      throw new BadRequestException(HotelReservationErrorMessages.RESERVATION_CONFLICT.getMessage());
+    boolean isConflictReservation =
+        hotelReservationRepository.isConflictReservation(
+            request.getHotelRoomId(), checkInDate, checkOutDate, null);
+    reservationValidator.validateConflict(isConflictReservation);
 
     reservationValidator.validateCheckInAndCheckOut(checkInDate, checkOutDate);
-    boolean isValidRoom = hotelRoomRepository.validateHotelRoom(request.getHotelId(), request.getHotelRoomId());
+    boolean isValidRoom =
+        hotelRoomRepository.validateHotelRoom(request.getHotelId(), request.getHotelRoomId());
     reservationValidator.validateHotelRoom(isValidRoom);
 
     Hotel hotel = entityManager.getReference(Hotel.class, request.getHotelId());
@@ -68,7 +73,6 @@ public class HotelReservationServiceImpl implements HotelReservationService {
             .totalPrice(calculateTotalPrice(checkInDate, checkOutDate, hotelRoom.getPrice()))
             .build();
     hotelReservationRepository.persistAndFlush(hotelReservation);
-
     return HotelReservationDetailResponse.build(hotelReservation);
   }
 
@@ -82,20 +86,23 @@ public class HotelReservationServiceImpl implements HotelReservationService {
         DateFormat.parseDate(request.getCheckOutDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
     reservationValidator.validateCheckInAndCheckOut(checkInDate, checkOutDate);
 
-    boolean isConflictReservation = hotelReservationRepository.isConflictReservation(
+    boolean isConflictReservation =
+        hotelReservationRepository.isConflictReservation(
             request.getHotelRoomId(), checkInDate, checkOutDate, id);
     reservationValidator.validateConflict(isConflictReservation);
 
     if (request.getHotelRoomId() != null) {
       // if nor room id in request, assume that room belong to hotel
       Long hotelId = hotelReservationRepository.getHotelIdByReservationId(id);
-      boolean isValidRoom = hotelRoomRepository.validateHotelRoom(hotelId, request.getHotelRoomId());
+      boolean isValidRoom =
+          hotelRoomRepository.validateHotelRoom(hotelId, request.getHotelRoomId());
       reservationValidator.validateHotelRoom(isValidRoom);
     }
 
     HotelReservation hotelReservation = getReservationById(id);
     if (hotelReservation.getCancelledAt() != null)
-      throw new BadRequestException(HotelReservationErrorMessages.CAN_NOT_UPDATE_CANCELLED_RESERVATION.getMessage());
+      throw new BadRequestException(
+          HotelReservationErrorMessages.CAN_NOT_UPDATE_CANCELLED_RESERVATION.getMessage());
 
     GenericPatcher<HotelReservation> patcher = new GenericPatcher<>();
     HotelReservation hotelReservationUpdate =

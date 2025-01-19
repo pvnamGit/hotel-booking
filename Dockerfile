@@ -1,15 +1,30 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:11-jre-slim
+# Stage 1: Build the application using Maven
+FROM maven:3.8.8-eclipse-temurin-11 AS builder
 
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the application's jar to the container
-COPY target/your-app.jar /app/hotel-booking.jar
+# Copy the Maven project files
+COPY pom.xml ./
+COPY src ./src
 
-# Make port 8080 available to the world outside this container
+# Run Maven to build the application
+RUN mvn clean package -DskipTests
+
+# Stage 2: Create a lightweight runtime image
+FROM openjdk:11-jre-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the built JAR file from the builder stage
+COPY --from=builder /app/target/*.jar hotel-booking.jar
+
+# Expose the application's port
 EXPOSE 8080
 
-# Run the jar file
-ENTRYPOINT ["java", "-jar", "your-app.jar"]
-ENV SPRING_PROFILES_ACTIVE dev
+# Set the default command to run the application
+ENTRYPOINT ["java", "-jar", "hotel-booking.jar"]
+
+# Set the active Spring profile (adjust as needed)
+ENV SPRING_PROFILES_ACTIVE=dev
