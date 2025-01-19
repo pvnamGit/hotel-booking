@@ -13,10 +13,8 @@ public class HotelBookingApplication {
   private static final Logger logger = LoggerFactory.getLogger(HotelBookingApplication.class);
 
   public static void main(String[] args) {
+    logger.info("Start the application...");
     SpringApplication.run(HotelBookingApplication.class, args);
-    logger.debug("This is a debug message");
-    logger.info("This is a info message");
-    logger.warn("This is a warn message");
-    logger.error("This is a error message");
+    logger.info("Application started...");
   }
 }

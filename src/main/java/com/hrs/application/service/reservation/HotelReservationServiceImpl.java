@@ -44,98 +44,107 @@ public class HotelReservationServiceImpl implements HotelReservationService {
 
   @Override
   public HotelReservationDetailResponse createReservation(HotelReservationCreateRequest request)
-      throws BadRequestException {
+          throws BadRequestException {
+    logger.info("Creating reservation for hotel room ID: {}", request.getHotelRoomId());
     LocalDate checkInDate =
-        DateFormat.parseDate(request.getCheckInDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
+            DateFormat.parseDate(request.getCheckInDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
     LocalDate checkOutDate =
-        DateFormat.parseDate(request.getCheckOutDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
+            DateFormat.parseDate(request.getCheckOutDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
+
     boolean isConflictReservation =
-        hotelReservationRepository.isConflictReservation(
-            request.getHotelRoomId(), checkInDate, checkOutDate, null);
+            hotelReservationRepository.isConflictReservation(
+                    request.getHotelRoomId(), checkInDate, checkOutDate, null);
     reservationValidator.validateConflict(isConflictReservation);
 
     reservationValidator.validateCheckInAndCheckOut(checkInDate, checkOutDate);
     boolean isValidRoom =
-        hotelRoomRepository.validateHotelRoom(request.getHotelId(), request.getHotelRoomId());
+            hotelRoomRepository.validateHotelRoom(request.getHotelId(), request.getHotelRoomId());
     reservationValidator.validateHotelRoom(isValidRoom);
 
     Hotel hotel = entityManager.getReference(Hotel.class, request.getHotelId());
     HotelRoom hotelRoom = hotelRoomRepository.findById(request.getHotelRoomId());
     User user = entityManager.getReference(User.class, currentUser.getCurrentUser().getUserId());
     HotelReservation hotelReservation =
-        HotelReservation.builder()
-            .checkInDate(checkInDate)
-            .checkOutDate(checkOutDate)
-            .user(user)
-            .hotel(hotel)
-            .hotelRoom(hotelRoom)
-            .noOfGuests(request.getNoOfGuests())
-            .totalPrice(calculateTotalPrice(checkInDate, checkOutDate, hotelRoom.getPrice()))
-            .build();
+            HotelReservation.builder()
+                    .checkInDate(checkInDate)
+                    .checkOutDate(checkOutDate)
+                    .user(user)
+                    .hotel(hotel)
+                    .hotelRoom(hotelRoom)
+                    .noOfGuests(request.getNoOfGuests())
+                    .totalPrice(calculateTotalPrice(checkInDate, checkOutDate, hotelRoom.getPrice()))
+                    .build();
     hotelReservationRepository.persistAndFlush(hotelReservation);
+
+    logger.info("Reservation created successfully for user: {}", currentUser.getCurrentUser().getUserId());
     return HotelReservationDetailResponse.build(hotelReservation);
   }
 
   @Override
   public HotelReservationDetailResponse updateReservation(
-      Long id, HotelReservationUpdateRequest request) throws BadRequestException {
+          Long id, HotelReservationUpdateRequest request) throws BadRequestException {
+    logger.info("Updating reservation with ID: {}", id);
     authorized(id);
+
     LocalDate checkInDate =
-        DateFormat.parseDate(request.getCheckInDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
+            DateFormat.parseDate(request.getCheckInDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
     LocalDate checkOutDate =
-        DateFormat.parseDate(request.getCheckOutDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
+            DateFormat.parseDate(request.getCheckOutDate(), DateFormat.DATE_FORMAT_DD_MM_YYYY);
     reservationValidator.validateCheckInAndCheckOut(checkInDate, checkOutDate);
 
     boolean isConflictReservation =
-        hotelReservationRepository.isConflictReservation(
-            request.getHotelRoomId(), checkInDate, checkOutDate, id);
+            hotelReservationRepository.isConflictReservation(
+                    request.getHotelRoomId(), checkInDate, checkOutDate, id);
     reservationValidator.validateConflict(isConflictReservation);
 
     if (request.getHotelRoomId() != null) {
-      // if nor room id in request, assume that room belong to hotel
       Long hotelId = hotelReservationRepository.getHotelIdByReservationId(id);
       boolean isValidRoom =
-          hotelRoomRepository.validateHotelRoom(hotelId, request.getHotelRoomId());
+              hotelRoomRepository.validateHotelRoom(hotelId, request.getHotelRoomId());
       reservationValidator.validateHotelRoom(isValidRoom);
     }
 
     HotelReservation hotelReservation = getReservationById(id);
     if (hotelReservation.getCancelledAt() != null)
       throw new BadRequestException(
-          HotelReservationErrorMessages.CAN_NOT_UPDATE_CANCELLED_RESERVATION.getMessage());
+              HotelReservationErrorMessages.CAN_NOT_UPDATE_CANCELLED_RESERVATION.getMessage());
 
     GenericPatcher<HotelReservation> patcher = new GenericPatcher<>();
     HotelReservation hotelReservationUpdate =
-        HotelReservation.builder()
-            .checkInDate(checkInDate)
-            .checkOutDate(checkOutDate)
-            .noOfGuests(request.getNoOfGuests())
-            .build();
+            HotelReservation.builder()
+                    .checkInDate(checkInDate)
+                    .checkOutDate(checkOutDate)
+                    .noOfGuests(request.getNoOfGuests())
+                    .build();
     if (request.getHotelRoomId() != null) {
       HotelRoom hotelRoom = hotelRoomRepository.findById(request.getHotelRoomId());
       hotelReservationUpdate.setTotalPrice(
-          (calculateTotalPrice(checkInDate, checkOutDate, hotelRoom.getPrice())));
+              (calculateTotalPrice(checkInDate, checkOutDate, hotelRoom.getPrice())));
       hotelReservation.setHotelRoom(hotelRoom);
     }
     patcher.patch(hotelReservation, hotelReservationUpdate);
     hotelReservation.setUpdatedAt(Instant.now().toEpochMilli());
     hotelReservationRepository.merge(hotelReservation);
+
+    logger.info("Reservation with ID: {} updated successfully", id);
     return HotelReservationDetailResponse.build(hotelReservation);
   }
 
   @Override
   public List<HotelReservationDetailResponse> getReservations() {
+    logger.info("Fetching reservations for user: {}", currentUser.getCurrentUser().getUserId());
     List<HotelReservation> hotelReservations =
-        hotelReservationRepository.findReservationsByUserId(
-            currentUser.getCurrentUser().getUserId());
+            hotelReservationRepository.findReservationsByUserId(
+                    currentUser.getCurrentUser().getUserId());
     return hotelReservations.stream()
-        .map(HotelReservationDetailResponse::build)
-        .collect(Collectors.toList());
+            .map(HotelReservationDetailResponse::build)
+            .collect(Collectors.toList());
   }
 
   @Override
   public HotelReservationDetailResponse getReservationDetail(Long id)
-      throws EntityNotFoundException, AccessDeniedException {
+          throws EntityNotFoundException, AccessDeniedException {
+    logger.info("Fetching details for reservation ID: {}", id);
     authorized(id);
     HotelReservation hotelReservation = getReservationById(id);
     return HotelReservationDetailResponse.build(hotelReservation);
@@ -143,16 +152,19 @@ public class HotelReservationServiceImpl implements HotelReservationService {
 
   @Override
   public HotelReservationDetailResponse cancelReservation(Long id) throws EntityNotFoundException {
+    logger.info("Canceling reservation with ID: {}", id);
     authorized(id);
     HotelReservation hotelReservation = getReservationById(id);
     hotelReservation.setCancelledAt(Instant.now().toEpochMilli());
     hotelReservation.setUpdatedAt(Instant.now().toEpochMilli());
     hotelReservationRepository.merge(hotelReservation);
+
+    logger.info("Reservation with ID: {} canceled successfully", id);
     return HotelReservationDetailResponse.build(hotelReservation);
   }
 
   private Double calculateTotalPrice(
-      LocalDate checkInDate, LocalDate checkOutDate, @Nullable Double price) {
+          LocalDate checkInDate, LocalDate checkOutDate, @Nullable Double price) {
     var noOfDays = ChronoUnit.DAYS.between(checkInDate, checkOutDate);
     if (price == null) price = 0.0;
     var totalPrice = Math.round(noOfDays * price * 100.0) / 100.0;
@@ -161,11 +173,13 @@ public class HotelReservationServiceImpl implements HotelReservationService {
   }
 
   private void authorized(Long id) throws EntityNotFoundException, AccessDeniedException {
+    logger.debug("Checking if user is authorized for reservation ID: {}", id);
     if (!hotelReservationRepository.authorizeUser(id, currentUser.getCurrentUser().getUserId()))
       throw new AccessDeniedException(HotelReservationErrorMessages.UNAUTHORIZED.getMessage());
   }
 
   private HotelReservation getReservationById(Long id) {
+    logger.debug("Fetching reservation with ID: {}", id);
     HotelReservation reservation = hotelReservationRepository.findById(id);
     if (reservation == null) throw new EntityNotFoundException();
     return reservation;
