@@ -31,7 +31,7 @@ _Navigate to Project Directory:_
 cd hotel-booking
 ```
 #### 2. Environment Variables:
-Before running the application, make sure to set up the required environment variables. Create a .env file in the root directory of the project and populate it with the following variables:
+Before running the application, make sure to set up the required environment variables. Create a `.env` file in the root directory of the project and populate it with the following variables:
 ```
 URL_PREFIX=api/v1
 DB_USERNAME=
@@ -65,7 +65,8 @@ mvn spring-boot:run
 ```
 
 #### 2. Start application by docker-compose.yml
-From the root directory of the project, run the following command to start the application and the PostgreSQL container:
+- Create a `.env.docker` file in the root directory of the project and populate it with the following variables. See the introduction: **2. Environment Variables**
+- From the root directory of the project, run the following command to start the application and the PostgreSQL container:
 ```bash
 docker-compose up --build
 ```
